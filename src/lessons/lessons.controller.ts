@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { CreateEvaluationDto } from '../evaluations/dto/create-evaluation.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('lessons')
+@UseGuards(AuthGuard)
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
   @Get()
+  @Public()
   async getLessons() {
     return this.lessonsService.getLessons();
   }
