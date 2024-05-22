@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async getUsers(): Promise<UserDto[]> {
+    const entities = await this.userRepository.find();
+
+    return entities.map((entity) => this.mapToDto(entity));
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async createUser(dto: CreateUserDto): Promise<UserDto> {
+    const user = await this.userRepository.findOneBy({ email: dto.email });
+
+    if (user) throw new BadRequestException('Пользователь с таким email уже существует');
+
+    const newUser = this.userRepository.create({ ...dto });
+    await this.userRepository.save(newUser);
+
+    return this.mapToDto(newUser);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  private mapToDto(entity: User) {
+    const dto: UserDto = { ...entity };
+    return dto;
   }
 }
