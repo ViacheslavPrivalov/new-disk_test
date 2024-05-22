@@ -3,11 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { LessonsModule } from './lessons/lessons.module';
-import { EvaluationsModule } from './evaluations/evaluations.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: `${process.env.NODE_ENV}.env` }),
+    ConfigModule.forRoot({ envFilePath: `.env` }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -21,7 +20,6 @@ import { EvaluationsModule } from './evaluations/evaluations.module';
     }),
     UserModule,
     LessonsModule,
-    EvaluationsModule,
   ],
   controllers: [],
   providers: [],

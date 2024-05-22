@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Lesson } from './entities/lesson.entity';
+import { CreateEvaluationDto } from '../evaluations/dto/create-evaluation.dto';
+import { LessonDto } from './dto/lesson.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
-import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { Evaluation } from '../evaluations/entities/evaluattion.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class LessonsService {
-  create(createLessonDto: CreateLessonDto) {
-    return 'This action adds a new lesson';
+  constructor(
+    @InjectRepository(Lesson)
+    private readonly lessonRepository: Repository<Lesson>,
+    @InjectRepository(Evaluation)
+    private readonly evaluationRepository: Repository<Evaluation>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async getLessons(): Promise<Lesson[]> {
+    return this.lessonRepository.find({ relations: { evaluations: true } });
   }
 
-  findAll() {
-    return `This action returns all lessons`;
+  async createLesson(dto: CreateLessonDto): Promise<LessonDto> {
+    const newLesson = this.lessonRepository.create({ ...dto });
+
+    await this.lessonRepository.save(newLesson);
+    const lessonDto: LessonDto = { ...newLesson };
+
+    return lessonDto;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} lesson`;
-  }
+  async createEvaluation(id: number, dto: CreateEvaluationDto) {
+    const lesson = await this.lessonRepository.findOneBy({ id });
 
-  update(id: number, updateLessonDto: UpdateLessonDto) {
-    return `This action updates a #${id} lesson`;
-  }
+    if (!lesson) throw new NotFoundException('Урок не был найден');
 
-  remove(id: number) {
-    return `This action removes a #${id} lesson`;
+    const user = await this.userRepository.findOneBy({ id: dto.user_id });
+
+    const newEvaluation = this.evaluationRepository.create({
+      score: dto.score,
+      createdAt: Date.now(),
+      lesson,
+      user,
+    });
+
+    await this.evaluationRepository.save(newEvaluation);
+
+    return { id: newEvaluation.id, ...dto };
   }
 }
