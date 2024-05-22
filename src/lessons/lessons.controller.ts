@@ -18,7 +18,7 @@ export class LessonsController {
   }
 
   @Post(':id/evaluations')
-  async createEvaluation(@Param('id') id: number, @Body() createEvaluationDto: CreateEvaluationDto) {
-    return this.lessonsService.createEvaluation(id, createEvaluationDto);
+  async createEvaluation(@Param('id') id: string, @Body() createEvaluationDto: CreateEvaluationDto) {
+    return this.lessonsService.createEvaluation(+id, createEvaluationDto);
   }
 }

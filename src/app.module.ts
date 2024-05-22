@@ -6,7 +6,7 @@ import { LessonsModule } from './lessons/lessons.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: `.env` }),
+    ConfigModule.forRoot({ envFilePath: '.env' }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,

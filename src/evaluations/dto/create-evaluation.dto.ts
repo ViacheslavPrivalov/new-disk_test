@@ -1,4 +1,4 @@
 export class CreateEvaluationDto {
-  user_id: number;
-  score: number;
+  user_id: string;
+  score: string;
 }

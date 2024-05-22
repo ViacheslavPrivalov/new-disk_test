@@ -30,7 +30,12 @@ export class UserService {
   }
 
   private mapToDto(entity: User) {
-    const dto: UserDto = { ...entity };
+    const dto: UserDto = {
+      id: entity.id.toString(),
+      name: entity.name,
+      email: entity.email,
+    };
+
     return dto;
   }
 }
