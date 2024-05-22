@@ -54,6 +54,8 @@ export class LessonsService {
 
     const user = await this.userRepository.findOneBy({ id: Number(dto.user_id) });
 
+    if (!user) throw new NotFoundException('Пользователь не был найден');
+
     const newEvaluation = this.evaluationRepository.create({
       score: Number(dto.score),
       lesson,
